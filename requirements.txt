@@ -1,0 +1,14 @@
+# Python dependencies for "Which Model When".
+# Reference environment: Python 3.9, single consumer GPU (CUDA 11.8), PyTorch 2.0.
+#
+# The data pipeline (code/data/extract.py) reads nuPlan .db files directly with the
+# standard-library sqlite3 module; it does NOT require nuplan-devkit. Only the raw
+# mini split (the .db files) is needed.
+numpy>=1.21
+torch>=2.0
+matplotlib>=3.5
+
+# Optional: only needed if you want to re-export the maps from .gpkg (not used by the
+# current models, which are agent-only). Listed for completeness.
+# pyarrow>=10
+# shapely>=2.0

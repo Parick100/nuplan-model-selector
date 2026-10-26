@@ -1,0 +1,60 @@
+background: "#F1EDE3"
+elements:
+  - elementId: bg
+    elementType: image
+    bounds: [0, 0, 960, 540]
+    src: "bg/p06.png"
+  - elementId: label
+    elementType: text
+    bounds: [48, 40, 700, 20]
+    content:
+      text: "05 / THE QUESTION WE ASK"
+      fontSize: 12
+      color: "#6B6559"
+      fontFace: Times New Roman
+  - elementId: headline
+    elementType: text
+    bounds: [48, 106, 330, 172]
+    content:
+      text: "no model\nwins\neverywhere"
+      fontSize: 34
+      color: "#26231E"
+      fontFace: Times New Roman
+      fontWeight: bold
+  - elementId: leftnote
+    elementType: text
+    bounds: [48, 296, 326, 112]
+    content:
+      text: "It depends on how much compute you are allowed to spend at test time."
+      fontSize: 16
+      color: "#26231E"
+      fontFace: Times New Roman
+  - elementId: fig
+    elementType: image
+    bounds: [400, 106, 512, 267]
+    src: "img/budget.png"
+  - elementId: rightnote
+    elementType: text
+    bounds: [400, 390, 512, 64]
+    content:
+      text: "That is the question our whole project is built to answer."
+      fontSize: 17
+      color: "#E85D26"
+      fontFace: Times New Roman
+      fontWeight: bold
+  - elementId: footer
+    elementType: text
+    bounds: [48, 508, 850, 16]
+    content:
+      text: "Chart shows the expected shape of the comparison, not measured results."
+      fontSize: 10
+      color: "#6B6559"
+      fontFace: Times New Roman
+  - elementId: pagenum
+    elementType: text
+    bounds: [870, 504, 42, 20]
+    content:
+      text: "06"
+      fontSize: 12
+      color: "#6B6559"
+      fontFace: Times New Roman

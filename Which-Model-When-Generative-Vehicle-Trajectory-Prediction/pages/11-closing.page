@@ -1,0 +1,39 @@
+background: "#F1EDE3"
+elements:
+  - elementId: bg
+    elementType: image
+    bounds: [0, 0, 960, 540]
+    src: "bg/p11.png"
+  - elementId: title
+    elementType: text
+    bounds: [48, 152, 864, 232]
+    content:
+      text: "no model\nwins everywhere"
+      fontSize: 78
+      color: "#26231E"
+      fontFace: Times New Roman
+      fontWeight: bold
+  - elementId: sub
+    elementType: text
+    bounds: [48, 408, 864, 64]
+    content:
+      text: "We will deliver the table that says which one wins where — and what that table is worth."
+      fontSize: 20
+      color: "#26231E"
+      fontFace: Times New Roman
+  - elementId: footer
+    elementType: text
+    bounds: [48, 508, 760, 16]
+    content:
+      text: "CS 1675 INTRODUCTION TO MACHINE LEARNING  ·  TEAM A / B / C / D"
+      fontSize: 10
+      color: "#26231E"
+      fontFace: Times New Roman
+  - elementId: pagenum
+    elementType: text
+    bounds: [870, 504, 42, 20]
+    content:
+      text: "11"
+      fontSize: 12
+      color: "#26231E"
+      fontFace: Times New Roman

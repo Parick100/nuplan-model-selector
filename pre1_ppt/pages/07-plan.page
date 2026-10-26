@@ -1,0 +1,202 @@
+background: "#F1EDE3"
+elements:
+  - elementId: bg
+    elementType: image
+    bounds: [0, 0, 960, 540]
+    src: "bg/p07.png"
+  - elementId: label
+    elementType: text
+    bounds: [48, 40, 700, 20]
+    content:
+      text: "06 / THE PLAN"
+      fontSize: 12
+      color: "#6B6559"
+      fontFace: Times New Roman
+  - elementId: headline
+    elementType: text
+    bounds: [48, 76, 864, 50]
+    content:
+      text: "four models, one brain"
+      fontSize: 36
+      color: "#26231E"
+      fontFace: Times New Roman
+      fontWeight: bold
+  - elementId: b1n
+    elementType: text
+    bounds: [76, 146, 120, 30]
+    content:
+      text: "1"
+      fontSize: 21
+      color: "#E85D26"
+      fontFace: Times New Roman
+      fontWeight: bold
+  - elementId: b2n
+    elementType: text
+    bounds: [248, 146, 120, 30]
+    content:
+      text: "2"
+      fontSize: 21
+      color: "#E85D26"
+      fontFace: Times New Roman
+      fontWeight: bold
+  - elementId: b3n
+    elementType: text
+    bounds: [420, 146, 120, 30]
+    content:
+      text: "3"
+      fontSize: 21
+      color: "#E85D26"
+      fontFace: Times New Roman
+      fontWeight: bold
+  - elementId: b4n
+    elementType: text
+    bounds: [592, 146, 120, 30]
+    content:
+      text: "4"
+      fontSize: 21
+      color: "#E85D26"
+      fontFace: Times New Roman
+      fontWeight: bold
+  - elementId: b5n
+    elementType: text
+    bounds: [764, 146, 120, 30]
+    content:
+      text: "5"
+      fontSize: 21
+      color: "#FBF9F4"
+      fontFace: Times New Roman
+      fontWeight: bold
+  - elementId: b1l
+    elementType: text
+    bounds: [60, 192, 152, 44]
+    content:
+      text: "extract\ndata"
+      fontSize: 13.5
+      color: "#6B6559"
+      fontFace: Times New Roman
+  - elementId: b2l
+    elementType: text
+    bounds: [232, 192, 152, 44]
+    content:
+      text: "train\nmodels"
+      fontSize: 13.5
+      color: "#6B6559"
+      fontFace: Times New Roman
+  - elementId: b3l
+    elementType: text
+    bounds: [404, 192, 152, 44]
+    content:
+      text: "sample\nfutures"
+      fontSize: 13.5
+      color: "#6B6559"
+      fontFace: Times New Roman
+  - elementId: b4l
+    elementType: text
+    bounds: [576, 192, 152, 44]
+    content:
+      text: "score\n& search"
+      fontSize: 13.5
+      color: "#6B6559"
+      fontFace: Times New Roman
+  - elementId: b5l
+    elementType: text
+    bounds: [748, 192, 152, 44]
+    content:
+      text: "pick the\nmodel"
+      fontSize: 13.5
+      color: "#E85D26"
+      fontFace: Times New Roman
+      fontWeight: bold
+  - elementId: m1
+    elementType: text
+    bounds: [48, 256, 280, 28]
+    content:
+      text: "ACCURACY"
+      fontSize: 18
+      color: "#26231E"
+      fontFace: Times New Roman
+      fontWeight: bold
+  - elementId: m1d
+    elementType: text
+    bounds: [340, 260, 572, 24]
+    content:
+      text: "how close the best guess gets to the real future"
+      fontSize: 15
+      color: "#6B6559"
+      fontFace: Times New Roman
+  - elementId: m2
+    elementType: text
+    bounds: [48, 300, 280, 28]
+    content:
+      text: "COVERAGE"
+      fontSize: 18
+      color: "#26231E"
+      fontFace: Times New Roman
+      fontWeight: bold
+  - elementId: m2d
+    elementType: text
+    bounds: [340, 304, 572, 24]
+    content:
+      text: "does it cover the futures that really happen?"
+      fontSize: 15
+      color: "#6B6559"
+      fontFace: Times New Roman
+  - elementId: m3
+    elementType: text
+    bounds: [48, 344, 280, 28]
+    content:
+      text: "SAFETY"
+      fontSize: 18
+      color: "#26231E"
+      fontFace: Times New Roman
+      fontWeight: bold
+  - elementId: m3d
+    elementType: text
+    bounds: [340, 348, 572, 24]
+    content:
+      text: "how often nothing lands near the truth"
+      fontSize: 15
+      color: "#6B6559"
+      fontFace: Times New Roman
+  - elementId: m4
+    elementType: text
+    bounds: [48, 388, 280, 28]
+    content:
+      text: "COST"
+      fontSize: 18
+      color: "#26231E"
+      fontFace: Times New Roman
+      fontWeight: bold
+  - elementId: m4d
+    elementType: text
+    bounds: [340, 392, 572, 24]
+    content:
+      text: "model calls and wall-clock time per prediction"
+      fontSize: 15
+      color: "#6B6559"
+      fontFace: Times New Roman
+  - elementId: readout
+    elementType: text
+    bounds: [48, 446, 864, 28]
+    content:
+      text: "One shared encoder. Only the way each model imagines is allowed to differ."
+      fontSize: 17
+      color: "#E85D26"
+      fontFace: Times New Roman
+      fontWeight: bold
+  - elementId: footer
+    elementType: text
+    bounds: [48, 508, 850, 16]
+    content:
+      text: "Headline comparison: both generative models use the same first-order solver, so a difference cannot come from the solver."
+      fontSize: 10
+      color: "#6B6559"
+      fontFace: Times New Roman
+  - elementId: pagenum
+    elementType: text
+    bounds: [870, 504, 42, 20]
+    content:
+      text: "07"
+      fontSize: 12
+      color: "#6B6559"
+      fontFace: Times New Roman

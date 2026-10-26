@@ -1,0 +1,40 @@
+# ---- 数据缓存（103 MB，不进仓库；由 code/data/build_mini.py 重新生成）----
+code/data/cache/
+*.npz
+*.npy
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# ---- 训练产物 ----
+runs/
+*.pt
+*.pth
+*.ckpt
+logs/
+eval/
+viz/
+
+# ---- 编辑器 / 系统 ----
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- 演示文稿生成中间物（保留页面源文件与成品 pptx，去掉重复的图片素材树和逐页预览）----
+# 这三份 img/assets 是同一批 PNG 的重复拷贝，留在仓库里只是噪声
+pre1_ppt/img/
+pre1_ppt/assets/
+pre1_ppt/bg/
+*/preview/
+Which-Model-When-Generative-Vehicle-Trajectory-Prediction/img/
+Which-Model-When-Generative-Vehicle-Trajectory-Prediction/bg/
+_extract/*.txt.bak
+
+# ---- 一次性的临时化验用图 ----
+bed694a85b85105d1d5510c5d0020da.png
