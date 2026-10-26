@@ -109,10 +109,16 @@ def main():
     ap.add_argument("--probe", type=int, default=12000)
     ap.add_argument("--ascii", type=int, default=0, help="对前 N 个场景打印 ASCII BEV")
     ap.add_argument("--scenes", default="", help="直接指定下标（逗号分隔），覆盖分层")
+    ap.add_argument("--per-stratum", type=int, default=1,
+                    help="每个分层抽几个场景（按转弯幅度分位取）")
+    ap.add_argument("--device", default="", help="cpu / cuda；留空自动选")
     ap.add_argument("--out", default=None)
     a = ap.parse_args()
 
-    dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    if a.device:
+        dev = torch.device(a.device)
+    else:
+        dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     ds = MiniTrajDataset(a.root, split=a.split, cache_logs=2)
     sc = ds.scale
     models = {o: load(a.runs, o, dev, a.suffix) for o in OBJS}
@@ -121,6 +127,7 @@ def main():
     if a.scenes:
         idx = [int(x) for x in a.scenes.split(",")]
         labels = [f"手工指定 {i}" for i in idx]
+        strata_of = [0] * len(idx)
     else:
         rng = np.random.default_rng(11)
         probe = rng.choice(len(ds), size=min(a.probe, len(ds)), replace=False)
@@ -128,18 +135,28 @@ def main():
         H = np.stack([ds[int(i)]["hist"].numpy() * sc for i in probe])
         V = np.linalg.norm(H[:, -1, 2:4], axis=-1)
         TR = np.array([heading_change(t) for t in P])
-        idx, labels = [], []
-        for name, vlo, vhi, tlo, thi in STRATA:
+        idx, labels, strata_of = [], [], []
+        n_per = max(1, a.per_stratum)
+        for si, (name, vlo, vhi, tlo, thi) in enumerate(STRATA):
             m = (V >= vlo) & (V < vhi) & (TR >= tlo) & (TR < thi)
             if m.sum() < 5:
                 print(f"  ! 层「{name}」只有 {int(m.sum())} 条，跳过")
                 continue
             sub = np.nonzero(m)[0]
-            # 取该层**转弯幅度中位**的样本：有代表性，不是挑最容易或最难的
-            tgt = np.median(np.abs(TR[sub]))
-            k = sub[np.argmin(np.abs(np.abs(TR[sub]) - tgt))]
-            idx.append(int(probe[k]))
-            labels.append(f"{name} (|turn| 中位 {tgt:.0f}°, 该层 n={int(m.sum())})")
+            # 在该层内按转弯幅度取若干分位：每层抽 n_per 个，
+            # 而不是只抽一个"中位"样本 —— 这样图里既有典型场景也有边角场景。
+            absT = np.abs(TR[sub])
+            qs = np.linspace(0.2, 0.8, n_per) if n_per > 1 else [0.5]
+            picked = []
+            for q in qs:
+                tgt = np.quantile(absT, q)
+                k = int(sub[np.argmin(np.abs(absT - tgt))])
+                if k not in picked:
+                    picked.append(k)
+            for k in picked:
+                idx.append(int(probe[k]))
+                labels.append(f"{name} (该层 n={int(m.sum())}, |turn| {abs(TR[k]):.0f}°)")
+                strata_of.append(si)
     print(f"\n选中 {len(idx)} 个场景：")
     for i, l in zip(idx, labels):
         print(f"  idx {i:>6}  {l}")
@@ -230,7 +247,8 @@ def main():
                                  f"   (K={st['n']}, NFE {st['nfe']})",
                                  fontsize=9, color=INK)
             # 左侧标注（英文，避免 matplotlib 缺中文字形渲染成方块）
-            axes[r][0].set_ylabel(EN_LABELS[r], fontsize=9, color=INK)
+            axes[r][0].set_ylabel(EN_LABELS[strata_of[r] % len(EN_LABELS)],
+                                  fontsize=9, color=INK)
         fig.suptitle("nuPlan mini - split 2 (unseen by all three models) - target-agent frame at t0\n"
                      "black = ground truth, blue = history, grey = neighbours, "
                      "thin coloured = all K candidates, thick = minADE-best candidate",

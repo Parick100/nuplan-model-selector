@@ -400,7 +400,9 @@ def main():
     pareto_check(rows, "方案 A（级联二分类门）")
     pareto_check(rowsB, "方案 B（回归 + 代价惩罚）")
 
-    rows = rows + [dict(r, tau=None, name="B") for r in rowsB]
+    rowsA = list(rows)                     # 方案 A 的工作点（保持独立，别和 B 混在一起）
+    rowsB = rowsB
+    rows_all = rowsA + [dict(r, tau=None, name="B") for r in rowsB]
 
     # ---------- 7. oracle 差距里有多少是"选择噪声"？用**分半诚实 oracle**
     #
@@ -416,41 +418,102 @@ def main():
     # ⚠ 之前用过的置换检验是**错的口径**：独立置换会摧毁三条臂之间 0.78–0.81 的相关性，
     #   得到的 null 差距（52.8%）比观测值（22.4%）还大，结论会完全反掉。
     print("\n" + "=" * 78)
-    print("[7] 可获得收益上限：分半诚实 oracle（用一半候选选、另一半候选评）")
+    print("[7] 上限、实现程度、以及为什么拿不到上限")
     print("=" * 78)
-    Cm = np.corrcoef(qmat.T)
-    print("  三条臂逐场 minADE 的相关性矩阵（都很高 → 难度是主因，模型差异是次要项）:")
-    print("          " + "".join(f"{o:>9}" for o in OBJS))
-    for i, o in enumerate(OBJS):
-        print(f"    {o:5s}   " + "".join(f"{Cm[i, j]:>9.3f}" for j in range(3)))
+    # ---- (7a) 上限：完美逐场选择（oracle）在**测试集**上的收益
+    fixed_test = q2.mean(axis=0).min()
+    oracle_test = q2.min(axis=1).mean()
+    ceiling = fixed_test - oracle_test
+    ceiling_pct = ceiling / fixed_test * 100
+    print("  (7a) 理论上限（完美逐场选择，即 oracle）")
+    print(f"    测试集上最好的固定模型 : {fixed_test:.3f} m   "
+          f"({OBJS[int(np.argmin(q2.mean(axis=0)))]})")
+    print(f"    完美逐场选择           : {oracle_test:.3f} m")
+    print(f"    → **上限收益 {ceiling:.3f} m = {ceiling_pct:.1f}%**")
+    print(f"    （这也是 split {a.label_split} 上的口径，两处一致："
+          f"{gap:.3f} m / {gap_pct:.1f}%）")
 
-    # 只有 K>=2 的臂能分半；reg 只有 1 条候选，就用它自身（无噪声，天然"诚实"）
-    qA, qB = [], []
-    for o in OBJS:
-        cd = L["cand"][o]
-        if cd.shape[1] >= 2:
-            h = cd.shape[1] // 2
-            qA.append(cd[:, :h].min(-1))
-            qB.append(cd[:, h:].min(-1))
-        else:
-            qA.append(cd[:, 0])
-            qB.append(cd[:, 0])
-    qA = np.stack(qA, 1)
-    qB = np.stack(qB, 1)
-    fixed_B = qB.mean(axis=0).min()
-    oracle_A = qA.min(axis=1)
-    oracle_A_on_B = qB[np.arange(len(qA)), qA.argmin(axis=1)].mean()
-    oracle_B = qB.min(axis=1).mean()
-    print(f"\n  用 A 半候选算出的 oracle 差距 : {qA.mean(axis=0).min() - oracle_A.mean():.4f} m")
-    print(f"  用 B 半候选算出的 oracle 差距 : {fixed_B - oracle_B:.4f} m")
-    print(f"  **诚实上限**：A 半选出模型、B 半评估  : {fixed_B - oracle_A_on_B:.4f} m "
-          f"({(fixed_B - oracle_A_on_B)/fixed_B*100:.1f}%)")
-    surv = (fixed_B - oracle_A_on_B) / max(qA.mean(axis=0).min() - oracle_A.mean(), 1e-9)
-    print(f"  收益保留率（诚实上限 / 朴素 oracle）: {surv*100:.1f}%")
-    if surv < 0.25:
-        print("  ❌ 收益在另一半候选上大部分消失 → 朴素 oracle 差距主要是选择噪声。")
-    else:
-        print("  ✅ 收益在独立候选上仍保留 → 存在真实的逐场差异，选择器有空间。")
+    # ---- (7b) 我们实际拿到多少
+    # ⚠ 必须在**同延迟**下比较：不同工作点的延迟差 50 倍，
+    #   直接拿它的 ADE 去和"最好的固定模型"比是没有意义的。
+    bp2 = [(nm, ade, lm) for nm, ade, lm, _ in base]
+    def interp_at(lm):
+        best = None
+        for (n0, a0, l0), (n1, a1, l1) in [(bp2[0], bp2[1]), (bp2[1], bp2[2]),
+                                          (bp2[0], bp2[2])]:
+            if abs(l1 - l0) < 1e-9:
+                continue
+            t = (lm - l0) / (l1 - l0)
+            if 0 <= t <= 1:
+                v = a0 + t * (a1 - a0)
+                best = v if best is None else min(best, v)
+        return best
+
+    print("\n  (7b) 我们的选择器拿到多少（都在**同延迟**下与固定臂线性插值比）")
+    for tag, pts in (("级联二分类门", rowsA), ("代价敏感回归", rowsB)):
+        if not pts:
+            continue
+        best, gain = None, None
+        for r in pts:
+            iv = interp_at(r["lat"])
+            if iv is None:
+                continue
+            g = iv - r["ade"]
+            if gain is None or g > gain:
+                gain, best = g, (r, iv)
+        if best is None:
+            continue
+        r, iv = best
+        print(f"    {tag:10s}: {r['ade']:.3f} m @ {r['lat']:.1f} ms，"
+              f"同延迟插值 {iv:.3f} m → 改善 {gain:.3f} m "
+              f"= 上限的 {max(0.0, gain)/max(ceiling,1e-9)*100:.0f}%")
+
+    # ---- (7c) 为什么拿不到：可预测性 + 抽样噪声
+    #
+    # 这里不再用"把候选分半、看 oracle 差距保留多少"的做法 —— 那个检验是错的：
+    #   它把每条臂的 K 拆成 K/2，既改变了每条臂本身的质量，又让统计量更噪，
+    #   得到的"保留率"没有明确含义。而且它回答的是"逐场优势是否可复现"，
+    #   不是"上限是否存在" —— 上限（oracle）按定义是存在的。
+    #
+    # 正确的诊断拆成两项：
+    #   (i)  可预测性：用特征预测 log q 的相关性 r，以及逐场**优势**的相关性；
+    #   (ii) 抽样可靠性：把每条臂的 K 条候选随机分成两半，
+    #        两半各自算出的逐场优势之间的一致性 —— 这部分是任何选择器都学不到的噪声。
+    print("\n  (7c) 为什么拿不到上限 —— 两个独立的瓶颈")
+    print("    (i) 可预测性（特征能不能预判'哪个模型更好'）")
+    for i, o in enumerate(OBJS):
+        r = np.corrcoef(pred_log[:, i], logq2[:, i])[0, 1]
+        print(f"        {o:5s}: 预测 log q 与真值 r = {r:+.3f}  (R² = {r*r:.2f})")
+    # 逐场优势的可预测性（reg vs fm、fm vs ddpm 各一条）
+    for i, j in ((0, 1), (1, 2)):
+        adv_true = logq2[:, i] - logq2[:, j]
+        adv_pred = pred_log[:, i] - pred_log[:, j]
+        r = np.corrcoef(adv_pred, adv_true)[0, 1]
+        print(f"        优势 ({OBJS[i]}−{OBJS[j]}) 的可预测性 r = {r:+.3f}")
+
+    print("    (ii) 抽样可靠性（逐场优势里有多少是采样噪声，谁都学不到）")
+    rng2 = np.random.default_rng(1)
+    for i, j in ((0, 1), (1, 2)):
+        rs = []
+        for _ in range(20):
+            ha, hb = [], []
+            for k in (i, j):
+                cd = T["cand"][OBJS[k]]
+                if cd.shape[1] < 2:
+                    ha.append(cd[:, 0]); hb.append(cd[:, 0]); continue
+                perm = rng2.permutation(cd.shape[1])
+                h = cd.shape[1] // 2
+                ha.append(cd[:, perm[:h]].min(-1))
+                hb.append(cd[:, perm[h:]].min(-1))
+            aa = ha[0] - ha[1]
+            bb = hb[0] - hb[1]
+            rs.append(np.corrcoef(aa, bb)[0, 1])
+        print(f"        优势 ({OBJS[i]}−{OBJS[j]}) 两半候选之间的一致性 r = "
+              f"{np.mean(rs):+.3f} ± {np.std(rs):.3f}")
+    print("\n    判读：")
+    print("      · (i) 低 → 特征不够，换更好的特征（地图/车道）直接受益，这是主要瓶颈。")
+    print("      · (ii) 高 → 逐场差异本身是真实的，不是采样噪声，值得继续投入。")
+    print("      · 两者都低 → 说明这个任务上'逐场换模型'的空间确实有限。")
 
     # ---------- 保存
     os.makedirs(os.path.dirname(a.out), exist_ok=True)
@@ -466,7 +529,7 @@ def main():
                        fixed={o: float(np.stack([T["q"][x] for x in OBJS], 1)
                                        .mean(axis=0)[i]) for i, o in enumerate(OBJS)},
                        oracle_test=float(q2.min(axis=1).mean()),
-                       sweep=rows), fh, ensure_ascii=False, indent=2)
+                       sweep=rows_all), fh, ensure_ascii=False, indent=2)
     print(f"\n报告已写入 {a.out}")
 
 
