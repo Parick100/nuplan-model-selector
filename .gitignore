@@ -1,7 +1,20 @@
-# ---- 数据缓存（103 MB，不进仓库；由 code/data/build_mini.py 重新生成）----
+# ============================================================================
+# 这个仓库只放**可复现的研究代码、结果与文档**。
+# 大数据缓存、模型权重、演示文稿源文件不进来。
+# ============================================================================
+
+# ---- 数据缓存（103 MB，由 code/data/build_mini.py 重新生成，不该进仓库）----
 code/data/cache/
 *.npz
 *.npy
+
+# ---- 训练产物（权重、日志、评测中间结果）----
+runs/
+*.pt
+*.pth
+*.ckpt
+logs/
+viz/
 
 # ---- Python ----
 __pycache__/
@@ -10,14 +23,14 @@ __pycache__/
 .pytest_cache/
 .ipynb_checkpoints/
 
-# ---- 训练产物 ----
-runs/
-*.pt
-*.pth
-*.ckpt
-logs/
-eval/
-viz/
+# ---- 演示文稿源文件（留在本地磁盘，不进仓库；成品 pptx 见用户本地）----
+pre1_ppt/
+Which-Model-When-Generative-Vehicle-Trajectory-Prediction/
+_extract/
+*/preview/
+
+# ---- 临时化验图 ----
+bed694a85b85105d1d5510c5d0020da.png
 
 # ---- 编辑器 / 系统 ----
 .vscode/
@@ -26,15 +39,5 @@ viz/
 Thumbs.db
 desktop.ini
 
-# ---- 演示文稿生成中间物（保留页面源文件与成品 pptx，去掉重复的图片素材树和逐页预览）----
-# 这三份 img/assets 是同一批 PNG 的重复拷贝，留在仓库里只是噪声
-pre1_ppt/img/
-pre1_ppt/assets/
-pre1_ppt/bg/
-*/preview/
-Which-Model-When-Generative-Vehicle-Trajectory-Prediction/img/
-Which-Model-When-Generative-Vehicle-Trajectory-Prediction/bg/
-_extract/*.txt.bak
-
-# ---- 一次性的临时化验用图 ----
-bed694a85b85105d1d5510c5d0020da.png
+# ---- Office 临时锁文件 ----
+~$*
