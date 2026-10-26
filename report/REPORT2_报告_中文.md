@@ -2,7 +2,7 @@
 
 **何时该用哪个模型：三种车辆轨迹预测方法的公平对比**
 
-组员：成员 A、成员 B、成员 C、成员 D · 代码：https://github.com/`<用户名>`/`<仓库名>`
+组员：成员 A、成员 B、成员 C、成员 D · 代码：https://github.com/Parick100/nuplan-model-selector
 
 ## 1. 我们用的数据
 

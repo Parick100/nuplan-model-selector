@@ -2,7 +2,8 @@
 
 **Which Model When: Comparing Three Ways to Predict Where a Car Will Drive**
 
-Members: Member A, Member B, Member C, Member D · Code: https://github.com/`<username>`/`<repo>`
+Members: Member A, Member B, Member C, Member D ·
+Code: https://github.com/Parick100/nuplan-model-selector
 
 ## 1. The data we use
 
